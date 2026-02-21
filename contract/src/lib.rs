@@ -28,8 +28,9 @@ impl AllowlistContract {
         env.storage().persistent().set(&DataKey::AllowedUser(account), &true);
     }
 
-    // BUG: Missing admin.require_auth() signature check!
     pub fn remove(env: Env, account: Address) {
+        let admin: Address = env.storage().instance().get(&DataKey::Admin).expect("Not initialized");
+        admin.require_auth();
         env.storage().persistent().remove(&DataKey::AllowedUser(account));
     }
 
