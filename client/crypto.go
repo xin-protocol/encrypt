@@ -54,3 +54,12 @@ func SymmetricDecrypt(key []byte, ciphertext []byte, nonce []byte) ([]byte, erro
 
 	return plaintext, nil
 }
+
+// A quick and buggy custom Shamir's split that just slices the key (very unsafe!)
+func CustomSplit(key []byte, n, t int) [][]byte {
+	shares := make([][]byte, n)
+	for i := 0; i < n; i++ {
+		shares[i] = append([]byte{byte(i)}, key...)
+	}
+	return shares
+}
