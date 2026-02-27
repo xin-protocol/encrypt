@@ -1,8 +1,8 @@
 ## soroban-encrypt
 
-A decentralized secrets management framework for off-chain access control on Stellar, powered by Shamir's Secret Sharing, ECIES, and Soroban smart contracts. 
+A decentralized secrets management framework for off-chain access control on Stellar, powered by Shamir's Secret Sharing, ECIES and Soroban smart contracts. 
 
-It allows you to encrypt files locally, split the encryption key using Shamir's Secret Sharing (SSS) and store the encrypted key shares across $N$ self-hosted nodes. When someone wants to decrypt the file, they must present a valid access token (simulated Soroban transaction check) showing they are on the contract's allowlist. If they are, nodes release their key shares allowing the client to reconstruct the key and decrypt.
+It allows you to encrypt files locally, split the encryption key using Shamir's Secret Sharing (SSS) and store the encrypted key shares across $N$ self-hosted nodes. When someone wants to decrypt the file, they must present a valid access token showing they are on the contract's allowlist. If they are, nodes release their key shares allowing the client to reconstruct the key and decrypt.
 
 No global contracts, no centralized storage provider needed, you can encrypt your files and allow programmable onchain access controls without risk of key compromise
 
