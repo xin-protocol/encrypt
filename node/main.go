@@ -82,8 +82,8 @@ func init() {
 		sorobanRPCURL = envRPC
 	}
 
-	// Generate Node's static key pair at startup
-	priv, err := GenerateNodeKey()
+	// Load or generate node key pair — persists across restarts
+	dir := os.Getenv("DATA_DIR"); if dir == "" { dir = dataDir }; priv, err := LoadOrGenerateKey(dir)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to initialize Node P-256 key pair: %v", err))
 	}
