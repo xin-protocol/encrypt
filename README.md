@@ -95,3 +95,11 @@ impl AllowlistContract {
     }
 }
 ```
+
+## Node Configuration
+
+| Env Var | Default | Description |
+|---------|---------|-------------|
+| `DATA_DIR` | `./data` | Directory for BoltDB share store and node key PEM |
+| `PORT` | `8080` | HTTP listen port |
+| `SOROBAN_RPC_URL` | testnet | Soroban JSON-RPC endpoint |
