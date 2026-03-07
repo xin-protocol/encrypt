@@ -1,0 +1,21 @@
+# soroban-encrypt node configuration
+# All fields can be overridden by the corresponding environment variable.
+
+port: "8080"
+data_dir: "./data"
+soroban_rpc_url: "https://soroban-testnet.stellar.org:443"
+log_level: "info"        # debug | info | warn | error
+
+tls_mode: "off"          # off | auto | manual
+domain: ""               # Required when tls_mode=auto (Let's Encrypt)
+tls_cert: ""             # Path to cert.pem (tls_mode=manual)
+tls_key: ""              # Path to key.pem  (tls_mode=manual)
+acme_cache_dir: "./data/acme"
+
+rate_limit: 10.0          # requests/second per IP (token bucket)
+rate_burst: 20            # burst allowance per IP
+
+store_api_key: ""         # Required X-Api-Key header value for /store
+metrics_api_key: ""       # Optional: protect /metrics endpoint
+
+timeout_seconds: 30
