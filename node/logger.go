@@ -58,3 +58,9 @@ func maskBytes(b []byte) string {
 func logStartup(cfg *Config) {
   logger.Info().Str("port", cfg.Port).Str("tls", cfg.TLSMode).Str("data_dir", cfg.DataDir).Msg("node_startup")
 }
+
+// rotateDailyLogFile checks if the audit log needs to roll to a new file.
+func rotateDailyLogFile() {
+	// Daily rotation is handled by openAuditFile() which uses the current date.
+	// This function is a no-op hook for future size-based rotation.
+}
