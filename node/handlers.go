@@ -248,3 +248,13 @@ func logStoreOutcome(objectID, contractID, remoteAddr, outcome string) {
 		Str("outcome", outcome).
 		Msg("store_audit")
 }
+
+// logRetrieveOutcome writes a structured audit log for /retrieve requests.
+func logRetrieveOutcome(caller, objectID, contractID, outcome string) {
+	auditLogger.Info().
+		Str("caller_address", caller).
+		Str("object_id", objectID).
+		Str("contract_id", contractID).
+		Str("outcome", outcome).
+		Msg("retrieve_audit")
+}
