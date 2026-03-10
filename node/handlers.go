@@ -208,3 +208,13 @@ func handleRetrieveShare(w http.ResponseWriter, r *http.Request) {
 		DecryptedShare: hex.EncodeToString(decrypted),
 	})
 }
+
+// logStoreOutcome writes a structured audit log entry for /store requests.
+func logStoreOutcome(objectID, contractID, remoteAddr, outcome string) {
+	auditLogger.Info().
+		Str("object_id", objectID).
+		Str("contract_id", contractID).
+		Str("remote", remoteAddr).
+		Str("outcome", outcome).
+		Msg("store_audit")
+}
