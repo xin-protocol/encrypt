@@ -96,3 +96,11 @@ func (sw *statusWriter) WriteHeader(code int) {
 	sw.code = code
 	sw.ResponseWriter.WriteHeader(code)
 }
+
+// maskSensitiveField returns a redacted version of a header value for logging.
+func maskSensitiveField(v string) string {
+	if len(v) < 8 {
+		return "****"
+	}
+	return v[:4] + "****"
+}
