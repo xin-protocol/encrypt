@@ -88,3 +88,8 @@ func getEnvInt(key string, fallback int) int {
 	}
 	return fallback
 }
+
+// RateLimiterConfig extracts rate limiting configuration fields.
+func (c *Config) RateLimiterConfig() (limit float64, burst int) {
+	return c.RateLimit, c.RateBurst
+}
