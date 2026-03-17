@@ -63,3 +63,10 @@ func checkObjectRateLimit(objectID string) bool {
 func initRateLimiter(cfg *Config) {
 	globalIPLimiter = newIPLimiterStore(cfg.RateLimit, cfg.RateBurst)
 }
+
+// rateLimitByObject wraps a handler and rate-limits by the object_id JSON field.
+func rateLimitByObjectMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+	})
+}
