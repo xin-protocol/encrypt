@@ -153,3 +153,10 @@ func storeAuthMiddleware(apiKey string, allowedIPs []string) func(http.Handler) 
 		return keyMw(ipMw(next))
 	}
 }
+
+// unauthorizedResponse writes a JSON 401 body.
+func unauthorizedResponse(w http.ResponseWriter, reason string) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusUnauthorized)
+	fmt.Fprintf(w, "{\"error\":\"unauthorized\",\"reason\":%q}\n", reason)
+}
