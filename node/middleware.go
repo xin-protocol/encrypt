@@ -144,3 +144,12 @@ func wrapWithMiddlewareChain(h http.Handler, middlewares ...func(http.Handler) h
 	}
 	return h
 }
+
+// storeAuthMiddleware combines apiKey check and IP allowlist for the /store endpoint.
+func storeAuthMiddleware(apiKey string, allowedIPs []string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		keyMw := apiKeyMiddleware(apiKey)
+		ipMw := ipAllowlistMiddleware(allowedIPs)
+		return keyMw(ipMw(next))
+	}
+}
