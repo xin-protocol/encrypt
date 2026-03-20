@@ -404,3 +404,6 @@ func retrieveShareFromNode(nodeURL, objectID, contractID, callerAddr string, sig
 
 	return rr.DecryptedShare, nil
 }
+
+// nodeAPIKey holds the --node-api-key flag value sent as X-Api-Key on /store.
+var nodeAPIKey string
