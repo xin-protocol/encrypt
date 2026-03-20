@@ -103,3 +103,16 @@ impl AllowlistContract {
 | `DATA_DIR` | `./data` | Directory for BoltDB share store and node key PEM |
 | `PORT` | `8080` | HTTP listen port |
 | `SOROBAN_RPC_URL` | testnet | Soroban JSON-RPC endpoint |
+
+### Encrypting with Node API Key
+
+If nodes require `STORE_API_KEY`, pass it with `--node-api-key`:
+
+```bash
+./client-bin encrypt \
+  --file secret.txt \
+  --nodes http://node1:8080,http://node2:8080,http://node3:8080 \
+  --threshold 2 \
+  --contract CCONTRACTID \
+  --node-api-key YOUR_STORE_API_KEY
+```
