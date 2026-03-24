@@ -193,3 +193,6 @@ func domainIsAllowed(host, configuredDomain string) bool { return host == config
 
 // shutdownTimeout is the maximum time allowed for graceful shutdown.
 const shutdownTimeout = 30 * time.Second
+
+// getListenAddr returns the formatted listen address string.
+func getListenAddr(port string) string { return ":" + port }
