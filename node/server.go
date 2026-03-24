@@ -163,3 +163,6 @@ func forwardToPeers(peers []string, apiKey string, body []byte) {
 		}(peer)
 	}
 }
+
+// getListenAddr returns the formatted listen address string.
+func getListenAddr(port string) string { return ":" + port }
