@@ -211,3 +211,9 @@ func buildManualTLSServer(addr string, handler http.Handler, cfg *Config) (*http
 	}
 	return &http.Server{Addr: addr, Handler: handler, TLSConfig: tlsCfg}, nil
 }
+
+// redirectToHTTPS sends a 301 redirect from HTTP to HTTPS for the same host+path.
+func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
+	target := "https://" + r.Host + r.URL.RequestURI()
+	http.Redirect(w, r, target, http.StatusMovedPermanently)
+}
