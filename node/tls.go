@@ -47,3 +47,15 @@ func hstsValue() string { return "max-age=63072000; includeSubDomains; preload" 
 func TLSConfigSummary(cfg *Config) string {
 	return fmt.Sprintf("mode=%s domain=%s cert=%s", cfg.TLSMode, cfg.Domain, cfg.TLSCert)
 }
+
+// tlsModeDescription returns a human-readable description of the TLS mode.
+func tlsModeDescription(mode string) string {
+	switch mode {
+	case "auto":
+		return "Let's Encrypt automatic certificate"
+	case "manual":
+		return "manual certificate from file"
+	default:
+		return "plaintext HTTP (no TLS)"
+	}
+}
