@@ -59,3 +59,6 @@ func tlsModeDescription(mode string) string {
 		return "plaintext HTTP (no TLS)"
 	}
 }
+
+// minTLSVersion returns the minimum TLS version name for logging.
+func minTLSVersionName() string { return "TLS 1.3" }
