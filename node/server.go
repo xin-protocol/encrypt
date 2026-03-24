@@ -1,0 +1,140 @@
+package main
+
+import (
+	"context"
+	"crypto/tls"
+	"fmt"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+	"golang.org/x/crypto/acme/autocert"
+)
+
+var nodeVersion = "dev"
+
+// buildMux constructs the node's HTTP mux with all routes and middleware.
+func buildMux(cfg *Config) http.Handler {
+	mux := http.NewServeMux()
+
+	// Public endpoints
+	mux.HandleFunc("/health", handleHealth)
+	mux.HandleFunc("/ready", handleReady)
+	mux.HandleFunc("/status", handleStatus)
+	mux.HandleFunc("/public-key", handleGetPublicKey)
+
+	// Auth-protected endpoints
+	storeMux := http.NewServeMux()
+	storeMux.HandleFunc("/store", handleStoreShare)
+	storeMux.HandleFunc("/retrieve", handleRetrieveShare)
+	storeMux.HandleFunc("/rotate-key", handleRotateKey)
+	storeMux.HandleFunc("/sync", handleSync)
+
+	mux.Handle("/store", apiKeyMiddleware(cfg.StoreAPIKey)(storeMux))
+	mux.Handle("/retrieve", rateLimitMiddleware(storeMux))
+	mux.Handle("/rotate-key", apiKeyMiddleware(cfg.StoreAPIKey)(storeMux))
+	mux.Handle("/sync", apiKeyMiddleware(cfg.StoreAPIKey)(storeMux))
+
+	chain := loggingMiddleware(bodySizeLimitMiddleware(1<<20)(rateLimitMiddleware(mux)))
+	return chain
+}
+
+// runServer starts the HTTP(S) server with graceful shutdown on SIGINT/SIGTERM.
+func runServer(cfg *Config) error {
+	handler := buildMux(cfg)
+
+	srv := &http.Server{
+		Addr:         ":" + cfg.Port,
+		Handler:      handler,
+		ReadTimeout:  time.Duration(cfg.TimeoutSecs) * time.Second,
+		WriteTimeout: time.Duration(cfg.TimeoutSecs) * time.Second,
+		IdleTimeout:  120 * time.Second,
+	}
+
+	switch cfg.TLSMode {
+	case "auto":
+		return runAutoTLS(cfg, handler)
+	case "manual":
+		return runManualTLS(cfg, srv)
+	default:
+		return runHTTP(srv)
+	}
+}
+
+func runHTTP(srv *http.Server) error {
+	logger.Info().Str("addr", srv.Addr).Str("tls", "off").Msg("node_starting")
+	return listenWithGracefulShutdown(srv)
+}
+
+func runManualTLS(cfg *Config, srv *http.Server) error {
+	tlsCfg, err := buildTLSConfig(cfg)
+	if err != nil {
+		return err
+	}
+	srv.TLSConfig = tlsCfg
+	// HTTP → HTTPS redirect on port 80
+	go startHTTPRedirect()
+	logger.Info().Str("addr", srv.Addr).Str("tls", "manual").Msg("node_starting")
+	return listenWithGracefulShutdown(srv)
+}
+
+func runAutoTLS(cfg *Config, handler http.Handler) error {
+	if err := os.MkdirAll(cfg.ACMECacheDir, 0700); err != nil {
+		return fmt.Errorf("failed to create ACME cache dir: %w", err)
+	}
+	m := &autocert.Manager{
+		Cache:      autocert.DirCache(cfg.ACMECacheDir),
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(cfg.Domain),
+	}
+	srv := &http.Server{
+		Addr:      ":443",
+		Handler:   handler,
+		TLSConfig: m.TLSConfig(),
+	}
+	go startHTTPRedirect()
+	logger.Info().Str("domain", cfg.Domain).Str("tls", "auto").Msg("node_starting")
+	return listenWithGracefulShutdown(srv)
+}
+
+func startHTTPRedirect() {
+	redirect := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), http.StatusMovedPermanently)
+	})
+	logger.Info().Str("addr", ":80").Msg("http_redirect_starting")
+	if err := http.ListenAndServe(":80", redirect); err != nil {
+		logger.Error().Err(err).Msg("http_redirect_failed")
+	}
+}
+
+func listenWithGracefulShutdown(srv *http.Server) error {
+	idleConnsClosed := make(chan struct{})
+	go func() {
+		sigCh := make(chan os.Signal, 1)
+		signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+		<-sigCh
+		logger.Info().Msg("shutdown_signal_received")
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
+			logger.Error().Err(err).Msg("shutdown_error")
+		}
+		closeDB()
+		close(idleConnsClosed)
+	}()
+
+	var err error
+	if srv.TLSConfig != nil {
+		err = srv.ListenAndServeTLS("", "")
+	} else {
+		err = srv.ListenAndServe()
+	}
+	if err != nil && err != http.ErrServerClosed {
+		return err
+	}
+	<-idleConnsClosed
+	logger.Info().Msg("node_stopped")
+	return nil
+}
