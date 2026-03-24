@@ -113,3 +113,6 @@ func (c *Config) RateLimiterConfig() (limit float64, burst int) {
 
 // StoreAuthRequired returns true if STORE_API_KEY is set.
 func (c *Config) StoreAuthRequired() bool { return c.StoreAPIKey != "" }
+
+// ACMEEnabled returns true when TLS_MODE is auto.
+func (c *Config) ACMEEnabled() bool { return c.TLSMode == "auto" }
