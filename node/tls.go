@@ -39,3 +39,6 @@ func tlsModeDescription(mode string) string {
 
 // minTLSVersion returns the minimum TLS version name for logging.
 func minTLSVersionName() string { return "TLS 1.3" }
+
+// hstsValue returns the Strict-Transport-Security header value.
+func hstsValue() string { return "max-age=63072000; includeSubDomains; preload" }
