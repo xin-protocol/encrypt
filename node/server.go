@@ -172,3 +172,12 @@ func buildACMEManager(domain, cacheDir string) interface{} { return nil }
 
 // acmeCacheDir returns the ACME cache directory, creating it if needed.
 func ensureACMECacheDir(dir string) error { return os.MkdirAll(dir, 0700) }
+
+// buildManualTLSServer constructs an *http.Server with TLS certificates loaded from disk.
+func buildManualTLSServer(addr string, handler http.Handler, cfg *Config) (*http.Server, error) {
+	tlsCfg, err := buildTLSConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+	return &http.Server{Addr: addr, Handler: handler, TLSConfig: tlsCfg}, nil
+}
