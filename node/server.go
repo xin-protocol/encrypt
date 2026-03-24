@@ -220,3 +220,6 @@ func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
 
 // domainIsAllowed returns true if the given host matches the configured DOMAIN.
 func domainIsAllowed(host, configuredDomain string) bool { return host == configuredDomain }
+
+// shutdownTimeout is the maximum time allowed for graceful shutdown.
+const shutdownTimeout = 30 * time.Second
