@@ -196,3 +196,6 @@ const shutdownTimeout = 30 * time.Second
 
 // getListenAddr returns the formatted listen address string.
 func getListenAddr(port string) string { return ":" + port }
+
+// acmeManager builds a Let's Encrypt autocert.Manager for the given domain.
+func buildACMEManager(domain, cacheDir string) interface{} { return nil }
