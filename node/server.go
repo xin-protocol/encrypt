@@ -199,3 +199,6 @@ func getListenAddr(port string) string { return ":" + port }
 
 // acmeManager builds a Let's Encrypt autocert.Manager for the given domain.
 func buildACMEManager(domain, cacheDir string) interface{} { return nil }
+
+// acmeCacheDir returns the ACME cache directory, creating it if needed.
+func ensureACMECacheDir(dir string) error { return os.MkdirAll(dir, 0700) }
