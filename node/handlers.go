@@ -258,3 +258,13 @@ func logRetrieveOutcome(caller, objectID, contractID, outcome string) {
 		Str("outcome", outcome).
 		Msg("retrieve_audit")
 }
+
+// fixedShareCount wraps countShares with an error log on failure.
+func fixedShareCount() int {
+	n, err := countShares()
+	if err != nil {
+		logger.Error().Err(err).Msg("share_count_failed")
+		return -1
+	}
+	return n
+}
