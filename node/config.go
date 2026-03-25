@@ -99,3 +99,9 @@ func (c *Config) StoreAuthRequired() bool { return c.StoreAPIKey != "" }
 
 // ACMEEnabled returns true when TLS_MODE is auto.
 func (c *Config) ACMEEnabled() bool { return c.TLSMode == "auto" }
+
+// ReadTimeout returns the HTTP server read timeout duration.
+func (c *Config) ReadTimeout() time.Duration { return time.Duration(c.TimeoutSecs) * time.Second }
+
+// WriteTimeout returns the HTTP server write timeout duration.
+func (c *Config) WriteTimeout() time.Duration { return time.Duration(c.TimeoutSecs) * time.Second }
