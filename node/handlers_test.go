@@ -64,3 +64,22 @@ func TestHandleStatus(t *testing.T) {
 		t.Errorf("expected 200, got %d", rr.Code)
 	}
 }
+
+func TestHandlePublicKey(t *testing.T) {
+	setupTestDB(t)
+	InitLogger("error")
+	// Generate a test key pair
+	var err error
+	nodePrivateKey, err = ecdh.P256().GenerateKey(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	nodePublicKey = nodePrivateKey.PublicKey()
+
+	req := httptest.NewRequest(http.MethodGet, "/public-key", nil)
+	rr := httptest.NewRecorder()
+	handleGetPublicKey(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected 200, got %d", rr.Code)
+	}
+}
