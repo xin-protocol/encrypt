@@ -125,3 +125,10 @@ func prometheusMiddleware(endpoint string) func(http.Handler) http.Handler {
 
 // observeSimulationDuration records the duration of a Soroban RPC simulation call.
 func observeSimulationDuration(d float64) { simulationDuration.Observe(d) }
+
+// updateSharesInStore refreshes the shares_in_store gauge from the BoltDB count.
+func updateSharesInStore() {
+	if n, err := countShares(); err == nil {
+		sharesInStore.Set(float64(n))
+	}
+}
