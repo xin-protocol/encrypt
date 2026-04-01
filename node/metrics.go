@@ -61,3 +61,16 @@ func metricsHandler(apiKey string) http.Handler {
 		h.ServeHTTP(w, r)
 	})
 }
+
+// prometheusMiddleware wraps a handler to record request metrics.
+func prometheusMiddleware(endpoint string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			timer := prometheus.NewTimer(requestDuration.WithLabelValues(endpoint))
+			defer timer.ObserveDuration()
+			sw := &statusWriter{ResponseWriter: w, code: http.StatusOK}
+			next.ServeHTTP(sw, r)
+			requestsTotal.WithLabelValues(endpoint, fmt.Sprintf("%d", sw.code)).Inc()
+		})
+	}
+}
