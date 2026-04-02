@@ -89,3 +89,12 @@ func updateSharesInStore() {
 func observeSimulationRPC(durationSecs float64) {
 	simulationDuration.Observe(durationSecs)
 }
+
+// recordAccessDecision increments either the granted or denied counter.
+func recordAccessDecision(granted bool) {
+	if granted {
+		accessGranted.Inc()
+	} else {
+		accessDenied.Inc()
+	}
+}
