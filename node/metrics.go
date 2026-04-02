@@ -132,3 +132,8 @@ func updateSharesInStore() {
 		sharesInStore.Set(float64(n))
 	}
 }
+
+// observeSimulationRPC records a completed simulation round-trip.
+func observeSimulationRPC(durationSecs float64) {
+	simulationDuration.Observe(durationSecs)
+}
