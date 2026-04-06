@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -63,5 +64,19 @@ func TestIPAllowlistForwardedFor(t *testing.T) {
 	h.ServeHTTP(rr, req)
 	if rr.Code != http.StatusOK {
 		t.Errorf("X-Forwarded-For: expected 200, got %d", rr.Code)
+	}
+}
+
+func TestLoggingMiddleware(t *testing.T) {
+	InitLogger("info")
+	h := loggingMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+
+	req := httptest.NewRequest(http.MethodPost, "/store", bytes.NewBufferString("hello world"))
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Errorf("expected 200, got %d", rr.Code)
 	}
 }

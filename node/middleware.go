@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -12,12 +14,18 @@ func loggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		rw := &statusWriter{ResponseWriter: w, code: http.StatusOK}
+		
+		bodyBytes, _ := io.ReadAll(r.Body)
+		bodySize := int64(len(bodyBytes))
+		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
 		next.ServeHTTP(rw, r)
 		logger.Info().
 			Str("method", r.Method).
 			Str("path", r.URL.Path).
 			Str("remote_addr", r.RemoteAddr).
 			Int("status", rw.code).
+			Int64("body_size", bodySize).
 			Int64("duration_us", time.Since(start).Microseconds()).
 			Msg("http_request")
 	})
