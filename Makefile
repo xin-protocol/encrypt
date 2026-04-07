@@ -17,3 +17,20 @@ clean:
 	rm -f *.enc *.json *.txt
 	rm -rf target/ contract/target/
 	@echo "Clean complete."
+
+REGISTRY ?= ghcr.io/teeyml
+TAG ?= latest
+
+docker-build:
+	docker build -t $(REGISTRY)/soroban-encrypt-node:$(TAG) ./node
+	docker build -t $(REGISTRY)/soroban-encrypt-client:$(TAG) ./client
+
+docker-push:
+	docker push $(REGISTRY)/soroban-encrypt-node:$(TAG)
+	docker push $(REGISTRY)/soroban-encrypt-client:$(TAG)
+
+docker-up:
+	docker-compose up --build -d
+
+docker-down:
+	docker-compose down
