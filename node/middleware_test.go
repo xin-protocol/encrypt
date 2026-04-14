@@ -19,6 +19,10 @@ func TestAPIKeyMiddlewareRejects(t *testing.T) {
 	if rr.Code != http.StatusUnauthorized {
 		t.Errorf("expected 401, got %d", rr.Code)
 	}
+	expected := "{\"error\":\"unauthorized\",\"reason\":\"Invalid API Key\"}\n"
+	if rr.Body.String() != expected {
+		t.Errorf("expected body %q, got %q", expected, rr.Body.String())
+	}
 }
 
 func TestAPIKeyMiddlewareAllows(t *testing.T) {

@@ -54,7 +54,7 @@ func apiKeyMiddleware(expectedKey string) func(http.Handler) http.Handler {
 			}
 			if !secureStringEqual(r.Header.Get("X-Api-Key"), expectedKey) {
 				logger.Warn().Str("path", r.URL.Path).Str("remote", r.RemoteAddr).Msg("api_key_rejected")
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				unauthorizedResponse(w, "Invalid API Key")
 				return
 			}
 			next.ServeHTTP(w, r)
