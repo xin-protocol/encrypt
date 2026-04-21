@@ -137,7 +137,7 @@ func storeAuthMiddleware(apiKey string, allowedIPs []string) func(http.Handler) 
 func unauthorizedResponse(w http.ResponseWriter, reason string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
-	fmt.Fprintf(w, "{\"error\":\"unauthorized\",\"reason\":%q}\n", reason)
+	fmt.Fprintf(w, "{\"error\":\"unauthorized\",\"error_reason\":%q}\n", reason)
 }
 
 // maskSensitiveField returns a redacted version of a header value for logging.
@@ -169,5 +169,5 @@ func storeAuthMiddleware(apiKey string, allowedIPs []string) func(http.Handler) 
 func unauthorizedResponse(w http.ResponseWriter, reason string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnauthorized)
-	fmt.Fprintf(w, "{\"error\":\"unauthorized\",\"reason\":%q}\n", reason)
+	fmt.Fprintf(w, "{\"error\":\"unauthorized\",\"error_reason\":%q}\n", reason)
 }
