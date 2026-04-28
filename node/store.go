@@ -104,34 +104,12 @@ func closeDB() {
 	}
 }
 
-// closeDB cleanly closes the BoltDB handle — call on shutdown.
-func closeDB() {
-	if db != nil {
-		if err := db.Close(); err != nil {
-			fmt.Printf("warning: failed to close BoltDB: %v\n", err)
-		}
-	}
-}
-
 // StoredShareV2 extends StoredShareDB with a key version for rotation support.
 type StoredShareV2 struct {
 	EphemeralPubKey []byte `json:"ephemeral_pubkey"`
 	Ciphertext      []byte `json:"ciphertext"`
 	Nonce           []byte `json:"nonce"`
 	KeyVersion      uint64 `json:"key_version"`
-}
-
-// listShareKeys returns all stored share keys (for debugging and rotation).
-func listShareKeys() ([]string, error) {
-	var keys []string
-	err := db.View(func(tx *bolt.Tx) error {
-		b := tx.Bucket([]byte(shareBucket))
-		return b.ForEach(func(k, _ []byte) error {
-			keys = append(keys, string(k))
-			return nil
-		})
-	})
-	return keys, err
 }
 
 // listShareKeys returns all stored share keys (for debugging and rotation).

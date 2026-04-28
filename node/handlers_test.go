@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/ecdh"
+	"crypto/rand"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -60,25 +62,6 @@ func TestHandleStatus(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/status", nil)
 	rr := httptest.NewRecorder()
 	handleStatus(rr, req)
-	if rr.Code != http.StatusOK {
-		t.Errorf("expected 200, got %d", rr.Code)
-	}
-}
-
-func TestHandlePublicKey(t *testing.T) {
-	setupTestDB(t)
-	InitLogger("error")
-	// Generate a test key pair
-	var err error
-	nodePrivateKey, err = ecdh.P256().GenerateKey(rand.Reader)
-	if err != nil {
-		t.Fatal(err)
-	}
-	nodePublicKey = nodePrivateKey.PublicKey()
-
-	req := httptest.NewRequest(http.MethodGet, "/public-key", nil)
-	rr := httptest.NewRecorder()
-	handleGetPublicKey(rr, req)
 	if rr.Code != http.StatusOK {
 		t.Errorf("expected 200, got %d", rr.Code)
 	}

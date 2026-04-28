@@ -238,33 +238,3 @@ func fixedShareCount() int {
 	}
 	return n
 }
-
-// logStoreOutcome writes a structured audit log entry for /store requests.
-func logStoreOutcome(objectID, contractID, remoteAddr, outcome string) {
-	auditLogger.Info().
-		Str("object_id", objectID).
-		Str("contract_id", contractID).
-		Str("remote", remoteAddr).
-		Str("outcome", outcome).
-		Msg("store_audit")
-}
-
-// logRetrieveOutcome writes a structured audit log for /retrieve requests.
-func logRetrieveOutcome(caller, objectID, contractID, outcome string) {
-	auditLogger.Info().
-		Str("caller_address", caller).
-		Str("object_id", objectID).
-		Str("contract_id", contractID).
-		Str("outcome", outcome).
-		Msg("retrieve_audit")
-}
-
-// fixedShareCount wraps countShares with an error log on failure.
-func fixedShareCount() int {
-	n, err := countShares()
-	if err != nil {
-		logger.Error().Err(err).Msg("share_count_failed")
-		return -1
-	}
-	return n
-}

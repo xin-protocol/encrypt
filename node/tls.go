@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/tls"
 	"fmt"
+	"net/http"
 )
 
 // buildTLSConfig creates a tls.Config enforcing TLS 1.3 minimum and HSTS.
@@ -23,29 +24,6 @@ func hstsMiddleware(next http.Handler) http.Handler {
 		w.Header().Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
 		next.ServeHTTP(w, r)
 	})
-}
-
-// tlsModeDescription returns a human-readable description of the TLS mode.
-func tlsModeDescription(mode string) string {
-	switch mode {
-	case "auto":
-		return "Let's Encrypt automatic certificate"
-	case "manual":
-		return "manual certificate from file"
-	default:
-		return "plaintext HTTP (no TLS)"
-	}
-}
-
-// minTLSVersion returns the minimum TLS version name for logging.
-func minTLSVersionName() string { return "TLS 1.3" }
-
-// hstsValue returns the Strict-Transport-Security header value.
-func hstsValue() string { return "max-age=63072000; includeSubDomains; preload" }
-
-// TLSConfigSummary returns a loggable string describing the active TLS config.
-func TLSConfigSummary(cfg *Config) string {
-	return fmt.Sprintf("mode=%s domain=%s cert=%s", cfg.TLSMode, cfg.Domain, cfg.TLSCert)
 }
 
 // tlsModeDescription returns a human-readable description of the TLS mode.

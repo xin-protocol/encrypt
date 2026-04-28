@@ -1,8 +1,8 @@
 package main
 
 import (
+	"bytes"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -163,36 +163,6 @@ func forwardToPeers(peers []string, apiKey string, body []byte) {
 		}(peer)
 	}
 }
-
-// getListenAddr returns the formatted listen address string.
-func getListenAddr(port string) string { return ":" + port }
-
-// acmeManager builds a Let's Encrypt autocert.Manager for the given domain.
-func buildACMEManager(domain, cacheDir string) interface{} { return nil }
-
-// acmeCacheDir returns the ACME cache directory, creating it if needed.
-func ensureACMECacheDir(dir string) error { return os.MkdirAll(dir, 0700) }
-
-// buildManualTLSServer constructs an *http.Server with TLS certificates loaded from disk.
-func buildManualTLSServer(addr string, handler http.Handler, cfg *Config) (*http.Server, error) {
-	tlsCfg, err := buildTLSConfig(cfg)
-	if err != nil {
-		return nil, err
-	}
-	return &http.Server{Addr: addr, Handler: handler, TLSConfig: tlsCfg}, nil
-}
-
-// redirectToHTTPS sends a 301 redirect from HTTP to HTTPS for the same host+path.
-func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
-	target := "https://" + r.Host + r.URL.RequestURI()
-	http.Redirect(w, r, target, http.StatusMovedPermanently)
-}
-
-// domainIsAllowed returns true if the given host matches the configured DOMAIN.
-func domainIsAllowed(host, configuredDomain string) bool { return host == configuredDomain }
-
-// shutdownTimeout is the maximum time allowed for graceful shutdown.
-const shutdownTimeout = 30 * time.Second
 
 // getListenAddr returns the formatted listen address string.
 func getListenAddr(port string) string { return ":" + port }

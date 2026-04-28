@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 )
 
 // Config holds all node runtime configuration.
@@ -88,23 +89,6 @@ func getEnvInt(key string, fallback int) int {
 	}
 	return fallback
 }
-
-// RateLimiterConfig extracts rate limiting configuration fields.
-func (c *Config) RateLimiterConfig() (limit float64, burst int) {
-	return c.RateLimit, c.RateBurst
-}
-
-// StoreAuthRequired returns true if STORE_API_KEY is set.
-func (c *Config) StoreAuthRequired() bool { return c.StoreAPIKey != "" }
-
-// ACMEEnabled returns true when TLS_MODE is auto.
-func (c *Config) ACMEEnabled() bool { return c.TLSMode == "auto" }
-
-// ReadTimeout returns the HTTP server read timeout duration.
-func (c *Config) ReadTimeout() time.Duration { return time.Duration(c.TimeoutSecs) * time.Second }
-
-// WriteTimeout returns the HTTP server write timeout duration.
-func (c *Config) WriteTimeout() time.Duration { return time.Duration(c.TimeoutSecs) * time.Second }
 
 // RateLimiterConfig extracts rate limiting configuration fields.
 func (c *Config) RateLimiterConfig() (limit float64, burst int) {

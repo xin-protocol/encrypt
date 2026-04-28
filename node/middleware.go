@@ -139,35 +139,3 @@ func unauthorizedResponse(w http.ResponseWriter, reason string) {
 	w.WriteHeader(http.StatusUnauthorized)
 	fmt.Fprintf(w, "{\"error\":\"unauthorized\",\"error_reason\":%q}\n", reason)
 }
-
-// maskSensitiveField returns a redacted version of a header value for logging.
-func maskSensitiveField(v string) string {
-	if len(v) < 8 {
-		return "****"
-	}
-	return v[:4] + "****"
-}
-
-// wrapWithMiddlewareChain applies a sequence of middleware in the given order.
-func wrapWithMiddlewareChain(h http.Handler, middlewares ...func(http.Handler) http.Handler) http.Handler {
-	for i := len(middlewares) - 1; i >= 0; i-- {
-		h = middlewares[i](h)
-	}
-	return h
-}
-
-// storeAuthMiddleware combines apiKey check and IP allowlist for the /store endpoint.
-func storeAuthMiddleware(apiKey string, allowedIPs []string) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		keyMw := apiKeyMiddleware(apiKey)
-		ipMw := ipAllowlistMiddleware(allowedIPs)
-		return keyMw(ipMw(next))
-	}
-}
-
-// unauthorizedResponse writes a JSON 401 body.
-func unauthorizedResponse(w http.ResponseWriter, reason string) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusUnauthorized)
-	fmt.Fprintf(w, "{\"error\":\"unauthorized\",\"error_reason\":%q}\n", reason)
-}

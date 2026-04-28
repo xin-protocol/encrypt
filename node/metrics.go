@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -108,41 +109,4 @@ func requireMetricsKey(key string, next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(w, r)
 	})
-}
-
-// prometheusMiddleware wraps a handler to record request metrics.
-func prometheusMiddleware(endpoint string) func(http.Handler) http.Handler {
-	return func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			timer := prometheus.NewTimer(requestDuration.WithLabelValues(endpoint))
-			defer timer.ObserveDuration()
-			sw := &statusWriter{ResponseWriter: w, code: http.StatusOK}
-			next.ServeHTTP(sw, r)
-			requestsTotal.WithLabelValues(endpoint, fmt.Sprintf("%d", sw.code)).Inc()
-		})
-	}
-}
-
-// observeSimulationDuration records the duration of a Soroban RPC simulation call.
-func observeSimulationDuration(d float64) { simulationDuration.Observe(d) }
-
-// updateSharesInStore refreshes the shares_in_store gauge from the BoltDB count.
-func updateSharesInStore() {
-	if n, err := countShares(); err == nil {
-		sharesInStore.Set(float64(n))
-	}
-}
-
-// observeSimulationRPC records a completed simulation round-trip.
-func observeSimulationRPC(durationSecs float64) {
-	simulationDuration.Observe(durationSecs)
-}
-
-// recordAccessDecision increments either the granted or denied counter.
-func recordAccessDecision(granted bool) {
-	if granted {
-		accessGranted.Inc()
-	} else {
-		accessDenied.Inc()
-	}
 }
