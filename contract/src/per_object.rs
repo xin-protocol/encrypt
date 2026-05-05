@@ -35,3 +35,11 @@ pub fn check_object_access(env: &Env, object_id: &Symbol, account: &Address) -> 
     }
     false
 }
+
+pub fn emit_access_granted(env: &Env, caller: &Address, object_id: &Symbol) {
+    env.events().publish(("AccessGranted",), (caller.clone(), object_id.clone()));
+}
+
+pub fn emit_access_denied(env: &Env, caller: &Address, object_id: &Symbol) {
+    env.events().publish(("AccessDenied",), (caller.clone(), object_id.clone()));
+}
