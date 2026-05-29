@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>soroban-encrypt Node Dashboard</title>
+<style>
+  :root { --bg: #0f1117; --card: #1a1d2e; --accent: #6c63ff; --text: #e2e8f0; --muted: #64748b; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; padding: 2rem; }
+  header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+  header h1 { font-size: 1.5rem; font-weight: 700; }
+  header span { background: var(--accent); color: white; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.75rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+  .card { background: var(--card); border-radius: 0.75rem; padding: 1.5rem; border: 1px solid #2d3148; }
+  .card .label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .card .value { font-size: 2rem; font-weight: 700; margin-top: 0.5rem; color: var(--accent); }
+  .card .sub { font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem; }
+  h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+  table { width: 100%; border-collapse: collapse; background: var(--card); border-radius: 0.75rem; overflow: hidden; }
+  th, td { padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; }
+  th { background: #13152b; color: var(--muted); font-weight: 500; }
+  tr:not(:last-child) td { border-bottom: 1px solid #2d3148; }
+  .badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.75rem; }
+  .badge.granted { background: #064e3b; color: #34d399; }
+  .badge.denied { background: #7f1d1d; color: #f87171; }
+</style>
+</head>
+<body>
+<header>
+  <h1>⬡ soroban-encrypt</h1>
+  <span id="versionBadge">...</span>
+</header>
+
+<div class="grid">
+  <div class="card"><div class="label">Share Count</div><div class="value" id="shareCount">—</div><div class="sub">objects stored</div></div>
+  <div class="card"><div class="label">Key Version</div><div class="value" id="keyVersion">—</div><div class="sub">current key</div></div>
+  <div class="card"><div class="label">Uptime</div><div class="value" id="uptime" style="font-size:1.25rem">—</div><div class="sub">since last start</div></div>
+  <div class="card"><div class="label">Node Public Key</div><div class="value" id="pubkey" style="font-size:0.6rem;word-break:break-all">—</div></div>
+</div>
+
+<h2>Recent Access Log</h2>
+<table>
+  <thead><tr><th>Time</th><th>Caller</th><th>Object ID</th><th>Outcome</th></tr></thead>
+  <tbody id="accessLog"><tr><td colspan="4" style="color:var(--muted);text-align:center">Loading...</td></tr></tbody>
+</table>
+
+<script>
+async function refresh() {
+  try {
+    const s = await fetch('/status').then(r => r.json());
+    document.getElementById('shareCount').textContent = s.share_count ?? '—';
+    document.getElementById('keyVersion').textContent = s.current_key_version ?? '—';
+    document.getElementById('uptime').textContent = s.uptime ?? '—';
+    document.getElementById('pubkey').textContent = (s.public_key ?? '').slice(0, 32) + '…';
+    document.getElementById('versionBadge').textContent = s.version ?? 'dev';
+  } catch(e) { console.error(e); }
+}
+refresh();
+setInterval(refresh, 5000);
+</script>
+</body>
+</html>
