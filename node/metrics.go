@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	serverUptime = promauto.NewGauge(prometheus.GaugeOpts{
-		Name: "soroban_encrypt_server_uptime_seconds",
+	serverUptime = promauto.NewCounter(prometheus.CounterOpts{
+		Name: "soroban_encrypt_server_uptime_seconds_total",
 		Help: "Uptime of the server in seconds.",
 	})
 
@@ -58,13 +58,22 @@ var (
 func metricsHandler(apiKey string) http.Handler {
 	h := promhttp.Handler()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		serverUptime.Set(time.Since(nodeStartTime).Seconds())
 		if apiKey != "" && !secureStringEqual(r.Header.Get("X-Api-Key"), apiKey) {
 			http.Error(w, "Unauthorized", http.StatusUnauthorized)
 			return
 		}
 		h.ServeHTTP(w, r)
 	})
+}
+
+// StartUptimeTicker starts background ticks to increment the uptime counter.
+func StartUptimeTicker() {
+	go func() {
+		ticker := time.NewTicker(time.Second)
+		for range ticker.C {
+			serverUptime.Inc()
+		}
+	}()
 }
 
 // prometheusMiddleware wraps a handler to record request metrics.
