@@ -40,3 +40,12 @@ func TestConfigMaxBodySize(t *testing.T) {
 		t.Errorf("expected MaxBodySizeMB to be 25, got %d", cfg.MaxBodySizeMB)
 	}
 }
+
+func TestConfigHealthCheckPath(t *testing.T) {
+	os.Setenv("HEALTH_CHECK_PATH", "/custom-health")
+	defer os.Unsetenv("HEALTH_CHECK_PATH")
+	cfg := LoadConfig()
+	if cfg.HealthCheckPath != "/custom-health" {
+		t.Errorf("expected HealthCheckPath to be /custom-health, got %s", cfg.HealthCheckPath)
+	}
+}

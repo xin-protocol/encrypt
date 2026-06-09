@@ -24,6 +24,7 @@ type Config struct {
 	MetricsAPIKey string
 	TimeoutSecs   int
 	MaxBodySizeMB int64
+	HealthCheckPath string
 	Peers         []string
 }
 
@@ -45,6 +46,7 @@ func LoadConfig() *Config {
 		MetricsAPIKey: getEnv("METRICS_API_KEY", ""),
 		TimeoutSecs:   getEnvInt("TIMEOUT_SECONDS", 30),
 		MaxBodySizeMB: int64(getEnvInt("MAX_BODY_SIZE_MB", 10)),
+		HealthCheckPath: getEnv("HEALTH_CHECK_PATH", "/health"),
 	}
 }
 

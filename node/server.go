@@ -20,7 +20,7 @@ func buildMux(cfg *Config) http.Handler {
 	mux := http.NewServeMux()
 
 	// Public endpoints
-	mux.HandleFunc("/health", handleHealth)
+	mux.HandleFunc(cfg.HealthCheckPath, handleHealth)
 	mux.HandleFunc("/ready", handleReady)
 	mux.HandleFunc("/status", handleStatus)
 	mux.HandleFunc("/public-key", handleGetPublicKey)
