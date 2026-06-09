@@ -34,3 +34,11 @@ docker-up:
 
 docker-down:
 	docker-compose down
+
+VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
+BUILD_TIME := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
+LDFLAGS := -ldflags="-s -w -X main.version=$(VERSION) -X main.buildTime=$(BUILD_TIME)"
+
+build-versioned:
+	cd node && go build $(LDFLAGS) -o node-bin/node .
+	cd client && go build $(LDFLAGS) -o client-bin/client .
