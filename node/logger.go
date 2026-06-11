@@ -3,7 +3,6 @@ package main
 import (
 	"io"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -14,14 +13,9 @@ var auditLogger zerolog.Logger
 
 // InitLogger sets up the structured JSON logger and a daily audit log file.
 func InitLogger(level string) {
-	lvl := zerolog.InfoLevel
-	switch strings.ToLower(level) {
-	case "debug":
-		lvl = zerolog.DebugLevel
-	case "warn":
-		lvl = zerolog.WarnLevel
-	case "error":
-		lvl = zerolog.ErrorLevel
+	lvl, err := zerolog.ParseLevel(level)
+	if err != nil {
+		panic("failed to parse log level: " + err.Error())
 	}
 	zerolog.SetGlobalLevel(lvl)
 	logger = zerolog.New(os.Stdout).With().Timestamp().Str("service", "soroban-encrypt-node").Logger()

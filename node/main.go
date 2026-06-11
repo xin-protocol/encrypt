@@ -93,6 +93,8 @@ func init() {
 }
 
 func main() {
+	cfg := LoadConfig()
+	InitLogger(cfg.LogLevel)
 	fmt.Printf("Soroban-Encrypt Go Node public key: %s (started at %s)\n", hex.EncodeToString(nodePublicKey.Bytes()), nodeStartTime.Format(time.RFC3339))
 	StartUptimeTicker()
 
