@@ -362,8 +362,9 @@ impl AllowlistContract {
       <section id="api-reference">
         <h2>API Specification</h2>
         <p>Storage nodes expose simple REST endpoints for managing and retrieving key shares.</p>
+        
         <h3><code>POST /store</code></h3>
-        <p>Stores an encrypted key share. Protected by an optional API key.</p>
+        <p>Stores an encrypted key share on the node. Protected by an optional API key configured via <code class="inline-code">STORE_API_KEY</code>.</p>
         <pre><code>{
   "object_id": "document_123",
   "contract_id": "CAS3...ABCD",
@@ -371,11 +372,45 @@ impl AllowlistContract {
   "ciphertext": "de78...",
   "nonce": "a7b9..."
 }</code></pre>
+
+        <h3><code>POST /retrieve</code></h3>
+        <p>Retrieves a stored key share. The node verifies the caller address's signature and simulates the Soroban transaction on-chain before returning the decrypted share.</p>
+        <pre><code>{
+  "object_id": "document_123",
+  "contract_id": "CAS3...ABCD",
+  "caller_address": "GBXX...",
+  "signature": "8b5f...",
+  "message": "challengesignedmsg...",
+  "tx_xdr": "AAAAA..."
+}</code></pre>
       </section>
 
       <section id="sdk-integration">
-        <h2>SDK & Decryption</h2>
-        <p>Developers retrieve shares using the Go SDK or Client HTTP API. A decryption challenge is completed by querying $T$ of the $N$ storage nodes, fetching the decodable shares, and reconstructing the AES key to decrypt the ciphertext.</p>
+        <h2>Go Integration Example</h2>
+        <p>To retrieve a secret share programmatically, developers initialize a client instance and retrieve shares from the storage nodes:</p>
+        <pre><code>package main
+
+import (
+	"context"
+	"fmt"
+	"github.com/teeyml/soroban-encrypt/client"
+)
+
+func main() {
+	// Initialize client using metadata and Stellar private key seed
+	sdk, err := client.NewClient("metadata.json", "S...")
+	if err != nil {
+		panic(err)
+	}
+
+	// Fetch shares and decrypt the file
+	decryptedBytes, err := sdk.DecryptFile(context.Background(), "sensitive_data.enc")
+	if err != nil {
+		fmt.Printf("Decryption failed: %v\n", err)
+		return
+	}
+	fmt.Printf("Decrypted secret content: %s\n", string(decryptedBytes))
+}</code></pre>
       </section>
     </main>
   </div>
