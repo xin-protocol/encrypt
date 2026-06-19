@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -10,22 +11,23 @@ import (
 
 var logger zerolog.Logger
 var auditLogger zerolog.Logger
+var loggerOnce sync.Once
 
 // InitLogger sets up the structured JSON logger and a daily audit log file.
 func InitLogger(level string) {
-	lvl, err := zerolog.ParseLevel(level)
-	if err != nil {
-		lvl = zerolog.InfoLevel
-	}
+	lvl := parseLogLevel(level)
 	zerolog.SetGlobalLevel(lvl)
-	logger = zerolog.New(os.Stdout).With().Timestamp().Str("service", "soroban-encrypt-node").Logger()
 
-	af, err := openAuditFile()
-	var w io.Writer = os.Stdout
-	if err == nil {
-		w = io.MultiWriter(os.Stdout, af)
-	}
-	auditLogger = zerolog.New(w).With().Timestamp().Str("component", "audit").Logger()
+	loggerOnce.Do(func() {
+		logger = zerolog.New(os.Stdout).With().Timestamp().Str("service", "soroban-encrypt-node").Logger()
+
+		af, err := openAuditFile()
+		var w io.Writer = os.Stdout
+		if err == nil {
+			w = io.MultiWriter(os.Stdout, af)
+		}
+		auditLogger = zerolog.New(w).With().Timestamp().Str("component", "audit").Logger()
+	})
 }
 
 func openAuditFile() (*os.File, error) {
@@ -57,4 +59,13 @@ func logStartup(cfg *Config) {
 func rotateDailyLogFile() {
 	// Daily rotation is handled by openAuditFile() which uses the current date.
 	// This function is a no-op hook for future size-based rotation.
+}
+
+// parseLogLevel parses level string or defaults to InfoLevel.
+func parseLogLevel(level string) zerolog.Level {
+	lvl, err := zerolog.ParseLevel(level)
+	if err != nil {
+		return zerolog.InfoLevel
+	}
+	return lvl
 }

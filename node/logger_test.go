@@ -6,11 +6,11 @@ import (
 	"github.com/rs/zerolog"
 )
 
-func TestInitLoggerFallback(t *testing.T) {
-	// Should not panic on invalid log level
-	InitLogger("invalid-log-level")
+func TestParseLogLevelFallback(t *testing.T) {
+	// Should fallback to InfoLevel on invalid log level
+	lvl := parseLogLevel("invalid-log-level")
 
-	if zerolog.GlobalLevel() != zerolog.InfoLevel {
-		t.Errorf("expected global level to fallback to InfoLevel, got %v", zerolog.GlobalLevel())
+	if lvl != zerolog.InfoLevel {
+		t.Errorf("expected level to fallback to InfoLevel, got %v", lvl)
 	}
 }

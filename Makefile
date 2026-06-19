@@ -30,10 +30,10 @@ docker-push:
 	docker push $(REGISTRY)/soroban-encrypt-client:$(TAG)
 
 docker-up:
-	docker-compose up --build -d
+	docker compose up --build -d
 
 docker-down:
-	docker-compose down
+	docker compose down
 
 VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo "dev")
 BUILD_TIME := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
