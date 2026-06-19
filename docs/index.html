@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Soroban-Encrypt Documentation</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
   <style>
     :root {
       --bg-primary: #0a0e17;
@@ -99,7 +102,8 @@
       transition: all 0.2s ease;
     }
 
-    .nav-link:hover, .nav-link.active {
+    .nav-link:hover,
+    .nav-link.active {
       color: var(--text-primary);
       background-color: var(--bg-tertiary);
       padding-left: 1.2rem;
@@ -177,7 +181,8 @@
       font-size: 1.05rem;
     }
 
-    ul, ol {
+    ul,
+    ol {
       margin-bottom: 1.5rem;
       margin-left: 1.5rem;
       color: var(--text-secondary);
@@ -264,6 +269,7 @@
       .sidebar {
         display: none;
       }
+
       .content-wrapper {
         margin-left: 0;
         padding: 2rem;
@@ -271,15 +277,15 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="app-container">
     <aside class="sidebar">
       <div class="logo-container">
-        <div class="logo-icon">S</div>
         <span class="logo-text">Soroban-Encrypt</span>
       </div>
-      
+
       <nav>
         <span class="nav-section-title">Getting Started</span>
         <ul class="nav-list">
@@ -299,15 +305,18 @@
 
     <main class="content-wrapper">
       <header>
-        <span class="badge">Docs v1.0.0</span>
         <h1>Soroban-Encrypt Developer Guide</h1>
-        <p>A decentralized off-chain secrets management framework secured by Stellar's Soroban smart contracts, Shamir's Secret Sharing, and ECIES.</p>
+        <p>A decentralized off-chain secrets management framework secured by Stellar's Soroban smart contracts, Shamir's
+          Secret Sharing, and ECIES.</p>
       </header>
 
       <section id="overview">
         <h2>Overview & Architecture</h2>
-        <p>Soroban-Encrypt provides decentralized off-chain data encryption with programmable on-chain access controls. Unlike standard storage solutions, decryption keys are split into multiple shares and distributed across self-hosted storage nodes. Keys are reconstructed dynamically by authenticating against a Soroban smart contract.</p>
-        
+        <p>Soroban-Encrypt provides decentralized off-chain data encryption with programmable on-chain access controls.
+          Unlike standard storage solutions, decryption keys are split into multiple shares and distributed across
+          self-hosted storage nodes. Keys are reconstructed dynamically by authenticating against a Soroban smart
+          contract.</p>
+
         <div class="flow-diagram">
           <div class="flow-step">1. Local SSS Encryption & Key Splitting</div>
           <div class="flow-arrow">⬇ (ECIES encrypted dispatch)</div>
@@ -321,12 +330,19 @@
 
       <section id="how-nodes-work">
         <h2>How Nodes Work</h2>
-        <p>Storage nodes act as gatekeepers to key shares. Nodes run a Go HTTP REST API backed by a secure BoltDB key-value store.</p>
+        <p>Storage nodes act as gatekeepers to key shares. Nodes run a Go HTTP REST API backed by a secure BoltDB
+          key-value store.</p>
         <h3>1. Encryption & Storage Dispatch</h3>
-        <p>When encrypting files, the symmetric AES key is divided using Shamir's Secret Sharing (SSS) into $N$ shares with threshold $T$. Each share is encrypted using ECIES (Elliptic Curve Integrated Encryption Scheme) using the static P-256 public key of each destination storage node, ensuring only that specific node can read the share.</p>
-        
+        <p>When encrypting files, the symmetric AES key is divided using Shamir's Secret Sharing (SSS) into $N$ shares
+          with threshold $T$. Each share is encrypted using ECIES (Elliptic Curve Integrated Encryption Scheme) using
+          the static P-256 public key of each destination storage node, ensuring only that specific node can read the
+          share.</p>
+
         <h3>2. Soroban Authorization Verification</h3>
-        <p>To retrieve a share, a caller must submit the transaction XDR of a call to the smart contract's <code class="inline-code">approve</code> function. The node simulates the transaction envelope locally via Soroban JSON-RPC. If the contract executes successfully without panicking, authorization is granted, and the node returns the decrypted key share.</p>
+        <p>To retrieve a share, a caller must submit the transaction XDR of a call to the smart contract's <code
+            class="inline-code">approve</code> function. The node simulates the transaction envelope locally via Soroban
+          JSON-RPC. If the contract executes successfully without panicking, authorization is granted, and the node
+          returns the decrypted key share.</p>
       </section>
 
       <section id="usage">
@@ -343,7 +359,8 @@
 
       <section id="contract-spec">
         <h2>Smart Contracts</h2>
-        <p>To integrate with Soroban-Encrypt, developers write and deploy a Soroban smart contract implementing an <code class="inline-code">approve</code> function:</p>
+        <p>To integrate with Soroban-Encrypt, developers write and deploy a Soroban smart contract implementing an <code
+            class="inline-code">approve</code> function:</p>
         <pre><code>#[contractimpl]
 impl AllowlistContract {
     pub fn approve(env: Env, object_id: Bytes, caller: Address) {
@@ -362,9 +379,10 @@ impl AllowlistContract {
       <section id="api-reference">
         <h2>API Specification</h2>
         <p>Storage nodes expose simple REST endpoints for managing and retrieving key shares.</p>
-        
+
         <h3><code>POST /store</code></h3>
-        <p>Stores an encrypted key share on the node. Protected by an optional API key configured via <code class="inline-code">STORE_API_KEY</code>.</p>
+        <p>Stores an encrypted key share on the node. Protected by an optional API key configured via <code
+            class="inline-code">STORE_API_KEY</code>.</p>
         <pre><code>{
   "object_id": "document_123",
   "contract_id": "CAS3...ABCD",
@@ -374,7 +392,8 @@ impl AllowlistContract {
 }</code></pre>
 
         <h3><code>POST /retrieve</code></h3>
-        <p>Retrieves a stored key share. The node verifies the caller address's signature and simulates the Soroban transaction on-chain before returning the decrypted share.</p>
+        <p>Retrieves a stored key share. The node verifies the caller address's signature and simulates the Soroban
+          transaction on-chain before returning the decrypted share.</p>
         <pre><code>{
   "object_id": "document_123",
   "contract_id": "CAS3...ABCD",
@@ -387,7 +406,8 @@ impl AllowlistContract {
 
       <section id="sdk-integration">
         <h2>Go Integration Example</h2>
-        <p>To retrieve a secret share programmatically, developers initialize a client instance and retrieve shares from the storage nodes:</p>
+        <p>To retrieve a secret share programmatically, developers initialize a client instance and retrieve shares from
+          the storage nodes:</p>
         <pre><code>package main
 
 import (
@@ -428,4 +448,5 @@ func main() {
     });
   </script>
 </body>
+
 </html>
