@@ -11,6 +11,16 @@ build-client:
 build: build-node build-client
 	@echo "All binaries built successfully."
 
+test:
+	@echo "Running tests..."
+	cd node && go test ./...
+	cd client && go test ./...
+
+fmt:
+	@echo "Formatting Go code..."
+	cd node && go fmt ./...
+	cd client && go fmt ./...
+
 clean:
 	@echo "Cleaning up compiled binaries..."
 	rm -f node-bin client-bin
