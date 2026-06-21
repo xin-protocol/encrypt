@@ -52,6 +52,14 @@ func LoadConfig() *Config {
 
 // Validate checks required configuration combinations.
 func (c *Config) Validate() error {
+	if c.DataDir == "" {
+		return fmt.Errorf("DATA_DIR cannot be empty")
+	}
+	if c.SorobanRPCURL == "" {
+		return fmt.Errorf("SOROBAN_RPC_URL cannot be empty")
+	}
+
+
 	switch c.TLSMode {
 	case "off":
 		// ok
