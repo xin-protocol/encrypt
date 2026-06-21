@@ -119,12 +119,7 @@ func handleStoreShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	logger.Info().
-		Str("object_id", req.ObjectID).
-		Str("contract_id", req.ContractID).
-		Str("remote", r.RemoteAddr).
-		Str("outcome", "stored").
-		Msg("share_stored")
+	logStoreOutcome(req.ObjectID, req.ContractID, r.RemoteAddr, "stored")
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"status": "stored"})
@@ -205,11 +200,7 @@ func handleRetrieveShare(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	auditLogger.Info().
-		Str("caller", req.CallerAddress).
-		Str("object_id", req.ObjectID).
-		Str("outcome", "granted").
-		Msg("access_granted")
+	logRetrieveOutcome(req.CallerAddress, req.ObjectID, req.ContractID, "granted")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(RetrieveResponse{
