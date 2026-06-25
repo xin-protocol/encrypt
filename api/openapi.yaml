@@ -1,0 +1,12 @@
+openapi: 3.0.0
+info:
+  title: soroban-encrypt Node API
+  version: 1.0.0
+  description: API for storing and retrieving SSS key shares encrypted with ECIES
+paths:
+  /store:
+    post:
+      summary: Store a new key share
+      responses:
+        '200':
+          description: OK
