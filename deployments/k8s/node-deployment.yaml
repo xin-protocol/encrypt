@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: soroban-encrypt-node
+  labels:
+    app: soroban-encrypt-node
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: soroban-encrypt-node
+  template:
+    metadata:
+      labels:
+        app: soroban-encrypt-node
+    spec:
+      containers:
+      - name: node
+        image: ghcr.io/teeyml/soroban-encrypt-node:latest
+        ports:
+        - containerPort: 8080
