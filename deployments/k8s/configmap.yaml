@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: node-config
+data:
+  DATA_DIR: "/data"
+  SOROBAN_RPC_URL: "https://soroban-testnet.stellar.org:443"
