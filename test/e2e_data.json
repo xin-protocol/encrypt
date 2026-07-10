@@ -1,0 +1,8 @@
+{
+  "test_cases": [
+    {
+      "id": "case_1",
+      "description": "basic encryption"
+    }
+  ]
+}
