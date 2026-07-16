@@ -60,27 +60,9 @@ func checkObjectRateLimit(objectID string) bool {
 	return lim.(*rate.Limiter).Allow()
 }
 
-func initRateLimiter(cfg *Config) {
-	globalIPLimiter = newIPLimiterStore(cfg.RateLimit, cfg.RateBurst)
-}
 
-// rateLimitByObject wraps a handler and rate-limits by the object_id JSON field.
-func rateLimitByObjectMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		next.ServeHTTP(w, r)
-	})
-}
 
-// getOrCreateObjectLimiter returns an existing or new per-object rate limiter.
-func getOrCreateObjectLimiter(objectID string) *rate.Limiter {
-	key := "obj:" + objectID
-	lim, _ := objectLimiters.LoadOrStore(key, rate.NewLimiter(rate.Every(time.Second), 5))
-	return lim.(*rate.Limiter)
-}
 
-// writeRateLimitExceeded writes a 429 response with Retry-After header.
-func writeRateLimitExceeded(w http.ResponseWriter) {
-	w.Header().Set("Retry-After", "1")
-	w.Header().Set("X-RateLimit-Policy", "token-bucket")
-	http.Error(w, "Too Many Requests — please slow down", http.StatusTooManyRequests)
-}
+
+
+

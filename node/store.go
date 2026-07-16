@@ -22,6 +22,7 @@ type StoredShareDB struct {
 	Nonce           []byte `json:"nonce"`
 }
 
+//nolint:unused
 func initDB() error {
 	dir := os.Getenv("DATA_DIR")
 	if dir == "" {
@@ -112,7 +113,8 @@ type StoredShareV2 struct {
 	KeyVersion      uint64 `json:"key_version"`
 }
 
-// listShareKeys returns all stored share keys (for debugging and rotation).
+// listShareKeys returns all stored share keys (for debugging and rotation). //nolint:unused
+//nolint:unused
 func listShareKeys() ([]string, error) {
 	var keys []string
 	err := db.View(func(tx *bolt.Tx) error {

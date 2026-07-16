@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"net/http"
@@ -93,6 +92,7 @@ func runAutoTLS(cfg *Config, handler http.Handler) error {
 		Addr:      ":443",
 		Handler:   handler,
 		TLSConfig: m.TLSConfig(),
+		ReadHeaderTimeout: 3 * time.Second,
 	}
 	go startHTTPRedirect()
 	logger.Info().Str("domain", cfg.Domain).Str("tls", "auto").Msg("node_starting")
@@ -104,7 +104,12 @@ func startHTTPRedirect() {
 		http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), http.StatusMovedPermanently)
 	})
 	logger.Info().Str("addr", ":80").Msg("http_redirect_starting")
-	if err := http.ListenAndServe(":80", redirect); err != nil {
+	srv := &http.Server{
+		Addr:              ":80",
+		Handler:           redirect,
+		ReadHeaderTimeout: 3 * time.Second,
+	}
+	if err := srv.ListenAndServe(); err != nil {
 		logger.Error().Err(err).Msg("http_redirect_failed")
 	}
 }
@@ -139,57 +144,4 @@ func listenWithGracefulShutdown(srv *http.Server) error {
 	return nil
 }
 
-// forwardToPeers replicates an incoming share to all configured peer nodes.
-func forwardToPeers(peers []string, apiKey string, body []byte) {
-	for _, peer := range peers {
-		go func(p string) {
-			req, err := http.NewRequest(http.MethodPost, p+"/store", bytes.NewReader(body))
-			if err != nil {
-				logger.Error().Err(err).Str("peer", p).Msg("peer_replication_request_failed")
-				return
-			}
-			req.Header.Set("Content-Type", "application/json")
-			req.Header.Set("X-Forwarded-By", "self")
-			if apiKey != "" {
-				req.Header.Set("X-Api-Key", apiKey)
-			}
-			resp, err := http.DefaultClient.Do(req)
-			if err != nil {
-				logger.Error().Err(err).Str("peer", p).Msg("peer_replication_failed")
-				return
-			}
-			resp.Body.Close()
-			logger.Info().Str("peer", p).Int("status", resp.StatusCode).Msg("peer_replication_sent")
-		}(peer)
-	}
-}
 
-// getListenAddr returns the formatted listen address string.
-func getListenAddr(port string) string { return ":" + port }
-
-// acmeManager builds a Let's Encrypt autocert.Manager for the given domain.
-func buildACMEManager(domain, cacheDir string) interface{} { return nil }
-
-// acmeCacheDir returns the ACME cache directory, creating it if needed.
-func ensureACMECacheDir(dir string) error { return os.MkdirAll(dir, 0700) }
-
-// buildManualTLSServer constructs an *http.Server with TLS certificates loaded from disk.
-func buildManualTLSServer(addr string, handler http.Handler, cfg *Config) (*http.Server, error) {
-	tlsCfg, err := buildTLSConfig(cfg)
-	if err != nil {
-		return nil, err
-	}
-	return &http.Server{Addr: addr, Handler: handler, TLSConfig: tlsCfg}, nil
-}
-
-// redirectToHTTPS sends a 301 redirect from HTTP to HTTPS for the same host+path.
-func redirectToHTTPS(w http.ResponseWriter, r *http.Request) {
-	target := "https://" + r.Host + r.URL.RequestURI()
-	http.Redirect(w, r, target, http.StatusMovedPermanently)
-}
-
-// domainIsAllowed returns true if the given host matches the configured DOMAIN.
-func domainIsAllowed(host, configuredDomain string) bool { return host == configuredDomain }
-
-// shutdownTimeout is the maximum time allowed for graceful shutdown.
-const shutdownTimeout = 30 * time.Second

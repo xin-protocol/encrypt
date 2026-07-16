@@ -37,7 +37,7 @@ func TestHandleHealth(t *testing.T) {
 		t.Errorf("expected 200, got %d", rr.Code)
 	}
 	var body map[string]interface{}
-	json.NewDecoder(rr.Body).Decode(&body)
+	_ = json.NewDecoder(rr.Body).Decode(&body)
 	if body["status"] != "ok" {
 		t.Errorf("expected status=ok, got %v", body["status"])
 	}

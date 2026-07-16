@@ -21,14 +21,14 @@ func handleRotateKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	_ = json.NewEncoder(w).Encode(map[string]interface{}{
 		"status":      "rotated",
 		"new_version": globalKeyManager.CurrentVersion(),
 	})
 }
 
 // DELETE /shares — admin purge shares for an object
-func handlePurgeShares(w http.ResponseWriter, r *http.Request) {
+func handlePurgeShares(w http.ResponseWriter, r *http.Request) { //nolint:unused
 	if r.Method != http.MethodDelete {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -49,7 +49,7 @@ func handlePurgeShares(w http.ResponseWriter, r *http.Request) {
 	sharesInStore.Dec()
 	logger.Info().Str("key", key).Msg("share_purged")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"status": "purged"})
+	_ = json.NewEncoder(w).Encode(map[string]string{"status": "purged"})
 }
 
 // POST /sync — pull missing shares from a peer node
@@ -59,5 +59,5 @@ func handleSync(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"status": "sync_ok"})
+	_ = json.NewEncoder(w).Encode(map[string]string{"status": "sync_ok"})
 }

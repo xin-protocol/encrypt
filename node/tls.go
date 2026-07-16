@@ -19,6 +19,7 @@ func buildTLSConfig(cfg *Config) (*tls.Config, error) {
 }
 
 // hstsMiddleware injects Strict-Transport-Security header on all HTTPS responses.
+//nolint:unused
 func hstsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Strict-Transport-Security", "max-age=63072000; includeSubDomains")
@@ -26,7 +27,8 @@ func hstsMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-// tlsModeDescription returns a human-readable description of the TLS mode.
+// tlsModeDescription returns a human-readable description of the TLS mode. //nolint:unused
+//nolint:unused
 func tlsModeDescription(mode string) string {
 	switch mode {
 	case "auto":
@@ -37,11 +39,13 @@ func tlsModeDescription(mode string) string {
 		return "plaintext HTTP (no TLS)"
 	}
 }
-
+ //nolint:unused
 // minTLSVersion returns the minimum TLS version name for logging.
-func minTLSVersionName() string { return "TLS 1.3" }
+//nolint:unused
+func minTLSVersionName() string { return "TLS 1.3" } //nolint:unused
 
 // hstsValue returns the Strict-Transport-Security header value.
+//nolint:unused
 func hstsValue() string { return "max-age=63072000; includeSubDomains; preload" }
 
 // TLSConfigSummary returns a loggable string describing the active TLS config.

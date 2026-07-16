@@ -20,12 +20,14 @@ func handleHealth(w http.ResponseWriter, r *http.Request) {
 		dnsStatus = "failed: " + err.Error()
 	}
 
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
 		"status":  "ok",
 		"dns":     dnsStatus,
 		"uptime":  time.Since(nodeStartTime).String(),
 		"started": nodeStartTime.Format(time.RFC3339),
-	})
+	}); err != nil {
+		logger.Error().Err(err).Msg("encode error")
+	}
 }
 
 // GET /ready — readiness probe; 503 if BoltDB is not open
@@ -35,7 +37,9 @@ func handleReady(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ready"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"status": "ready"}); err != nil {
+		logger.Error().Err(err).Msg("encode error")
+	}
 }
 
 // GET /status — node summary
@@ -46,12 +50,14 @@ func handleStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]interface{}{
+	if err := json.NewEncoder(w).Encode(map[string]interface{}{
 		"version":     nodeVersion,
 		"public_key":  hex.EncodeToString(nodePublicKey.Bytes()),
 		"share_count": count,
 		"uptime":      time.Since(nodeStartTime).String(),
-	})
+	}); err != nil {
+		logger.Error().Err(err).Msg("encode error")
+	}
 }
 
 // GET /public-key
@@ -61,9 +67,11 @@ func handleGetPublicKey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	if err := json.NewEncoder(w).Encode(map[string]string{
 		"public_key": hex.EncodeToString(nodePublicKey.Bytes()),
-	})
+	}); err != nil {
+		logger.Error().Err(err).Msg("encode error")
+	}
 }
 
 // POST /store
@@ -122,7 +130,9 @@ func handleStoreShare(w http.ResponseWriter, r *http.Request) {
 	logStoreOutcome(req.ObjectID, req.ContractID, r.RemoteAddr, "stored")
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"status": "stored"})
+	if err := json.NewEncoder(w).Encode(map[string]string{"status": "stored"}); err != nil {
+		logger.Error().Err(err).Msg("encode error")
+	}
 }
 
 // POST /retrieve
@@ -203,9 +213,11 @@ func handleRetrieveShare(w http.ResponseWriter, r *http.Request) {
 	logRetrieveOutcome(req.CallerAddress, req.ObjectID, req.ContractID, "granted")
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(RetrieveResponse{
+	if err := json.NewEncoder(w).Encode(RetrieveResponse{
 		DecryptedShare: hex.EncodeToString(decrypted),
-	})
+	}); err != nil {
+		logger.Error().Err(err).Msg("encode error")
+	}
 }
 
 // logStoreOutcome writes a structured audit log entry for /store requests.
@@ -229,6 +241,7 @@ func logRetrieveOutcome(caller, objectID, contractID, outcome string) {
 }
 
 // fixedShareCount wraps countShares with an error log on failure.
+//nolint:unused
 func fixedShareCount() int {
 	n, err := countShares()
 	if err != nil {

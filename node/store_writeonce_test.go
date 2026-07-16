@@ -18,8 +18,8 @@ func TestWriteOnceConflict(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	db.Update(func(tx *bolt.Tx) error {
-		tx.CreateBucketIfNotExists([]byte(shareBucket))
+	_ = db.Update(func(tx *bolt.Tx) error {
+		_, _ = tx.CreateBucketIfNotExists([]byte(shareBucket))
 		return nil
 	})
 	globalStore = &BoltStore{}

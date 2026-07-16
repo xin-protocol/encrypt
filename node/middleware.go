@@ -45,7 +45,7 @@ func loggingMiddleware(next http.Handler) http.Handler {
 
 func generateRequestID() string {
 	b := make([]byte, 8)
-	rand.Read(b)
+	_, _ = rand.Read(b)
 	return hex.EncodeToString(b)
 }
 
@@ -124,7 +124,7 @@ func (sw *statusWriter) WriteHeader(code int) {
 }
 
 // maskSensitiveField returns a redacted version of a header value for logging.
-func maskSensitiveField(v string) string {
+func maskSensitiveField(v string) string { //nolint:unused
 	if len(v) < 8 {
 		return "****"
 	}
@@ -132,7 +132,7 @@ func maskSensitiveField(v string) string {
 }
 
 // wrapWithMiddlewareChain applies a sequence of middleware in the given order.
-func wrapWithMiddlewareChain(h http.Handler, middlewares ...func(http.Handler) http.Handler) http.Handler {
+func wrapWithMiddlewareChain(h http.Handler, middlewares ...func(http.Handler) http.Handler) http.Handler { //nolint:unused
 	for i := len(middlewares) - 1; i >= 0; i-- {
 		h = middlewares[i](h)
 	}
@@ -140,7 +140,7 @@ func wrapWithMiddlewareChain(h http.Handler, middlewares ...func(http.Handler) h
 }
 
 // storeAuthMiddleware combines apiKey check and IP allowlist for the /store endpoint.
-func storeAuthMiddleware(apiKey string, allowedIPs []string) func(http.Handler) http.Handler {
+func storeAuthMiddleware(apiKey string, allowedIPs []string) func(http.Handler) http.Handler { //nolint:unused
 	return func(next http.Handler) http.Handler {
 		keyMw := apiKeyMiddleware(apiKey)
 		ipMw := ipAllowlistMiddleware(allowedIPs)

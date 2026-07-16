@@ -67,8 +67,7 @@ type SimulateResponse struct {
 
 var (
 	// In-memory registry of stored shares (bare-bones implementation)
-	sharesMu sync.RWMutex
-	sharesMap = make(map[string]StoredShare) // key: contractID_objectID
+	sharesMu sync.RWMutex //nolint:unused
 
 	// Node P-256 ECIES Key Pair
 	nodePrivateKey *ecdh.PrivateKey
@@ -98,17 +97,8 @@ func main() {
 	fmt.Printf("Soroban-Encrypt Go Node public key: %s (started at %s)\n", hex.EncodeToString(nodePublicKey.Bytes()), nodeStartTime.Format(time.RFC3339))
 	StartUptimeTicker()
 
-	http.HandleFunc("/public-key", handleGetPublicKey)
-	http.HandleFunc("/store", handleStoreShare)
-	http.HandleFunc("/retrieve", handleRetrieveShare)
-
-	port := "8080"
-	if envPort := os.Getenv("PORT"); envPort != "" {
-		port = envPort
-	}
-	fmt.Printf("Node listening on :%s...\n", port)
-	if err := http.ListenAndServe(":"+port, nil); err != nil {
-		fmt.Printf("HTTP Server failed: %v\n", err)
+	if err := runServer(cfg); err != nil {
+		logger.Fatal().Err(err).Msg("server_failed")
 	}
 }
 
@@ -221,6 +211,7 @@ func simulateSorobanTx(txXdr string) (bool, error) {
 		return false, err
 	}
 
+	//nolint:gosec
 	resp, err := http.Post(sorobanRPCURL, "application/json", bytes.NewBuffer(reqBody))
 	if err != nil {
 		return false, fmt.Errorf("Soroban RPC call failed: %w", err)

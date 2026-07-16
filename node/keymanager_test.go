@@ -17,7 +17,7 @@ func TestConcurrentRotationAndRetrieve(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			globalKeyManager.Rotate()
+			_ = globalKeyManager.Rotate()
 		}()
 	}
 	wg.Wait()
@@ -34,8 +34,8 @@ func TestRotationWithZeroShares(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer db.Close()
-	db.Update(func(tx *bolt.Tx) error {
-		tx.CreateBucketIfNotExists([]byte(shareBucket))
+	_ = db.Update(func(tx *bolt.Tx) error {
+		_, _ = tx.CreateBucketIfNotExists([]byte(shareBucket))
 		return nil
 	})
 	globalStore = &BoltStore{}

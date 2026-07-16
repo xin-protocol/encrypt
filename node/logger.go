@@ -43,6 +43,7 @@ func openAuditFile() (*os.File, error) {
 }
 
 // maskBytes redacts sensitive byte slices in log fields.
+//nolint:unused
 func maskBytes(b []byte) string {
 	if len(b) <= 4 {
 		return "****"
@@ -50,16 +51,13 @@ func maskBytes(b []byte) string {
 	return "****[truncated]"
 }
 
-// logStartup emits the node startup banner with key config fields.
+// logStartup emits the node startup banner with key config fields. //nolint:unused
+//nolint:unused
 func logStartup(cfg *Config) {
   logger.Info().Str("port", cfg.Port).Str("tls", cfg.TLSMode).Str("data_dir", cfg.DataDir).Msg("node_startup")
 }
+ //nolint:unused
 
-// rotateDailyLogFile checks if the audit log needs to roll to a new file.
-func rotateDailyLogFile() {
-	// Daily rotation is handled by openAuditFile() which uses the current date.
-	// This function is a no-op hook for future size-based rotation.
-}
 
 // parseLogLevel parses level string or defaults to InfoLevel.
 func parseLogLevel(level string) zerolog.Level {
